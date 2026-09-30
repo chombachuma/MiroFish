@@ -1,0 +1,47 @@
+services:
+  backend:
+    image: python:3.11
+    working_dir: /app/backend
+    volumes:
+      - ./:/app
+      - backend_venv:/app/backend/.venv
+      - uv_cache:/root/.cache/uv
+    env_file:
+      - /run/base44/app.env
+    environment:
+      - FLASK_DEBUG=true
+      - UV_LINK_MODE=copy
+    command: ["sh", "-ec", "pip install -q uv==0.9.26 && uv sync --frozen && exec uv run python run.py"]
+    ports: ["5001:5001"]
+    restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -o /dev/null -m 5 http://localhost:5001/ || exit 1"]
+      interval: 15s
+      timeout: 6s
+      retries: 5
+      start_period: 300s
+
+  frontend:
+    image: node:22
+    working_dir: /app/frontend
+    volumes:
+      - ./:/app
+      - frontend_modules:/app/frontend/node_modules
+    environment:
+      - __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
+      - VITE_PROXY_TARGET=http://backend:5001
+      - CHOKIDAR_USEPOLLING=true
+    command: ["sh", "-ec", "npm ci && exec npx vite --host 0.0.0.0 --port 3000 --open false"]
+    ports: ["3000:3000"]
+    restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf -m 5 http://localhost:3000/ >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 6s
+      retries: 5
+      start_period: 120s
+
+volumes:
+  backend_venv:
+  uv_cache:
+  frontend_modules:

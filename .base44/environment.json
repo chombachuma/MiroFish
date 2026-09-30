@@ -1,0 +1,11 @@
+{
+  "previewPort": 3000,
+  "healthPath": "/",
+  "startCommand": "docker compose -f docker-compose.base44.yml up -d",
+  "secrets": [
+    {"name": "LLM_API_KEY", "description": "OpenAI-compatible LLM API key (e.g. Alibaba Bailian/DashScope or OpenAI)", "requiredAtBoot": true, "generatedForDevelopment": true},
+    {"name": "LLM_BASE_URL", "description": "OpenAI-compatible base URL (default https://api.openai.com/v1)", "requiredAtBoot": false},
+    {"name": "LLM_MODEL_NAME", "description": "Model name (default gpt-4o-mini)", "requiredAtBoot": false},
+    {"name": "ZEP_API_KEY", "description": "Zep Cloud API key from https://app.getzep.com/", "requiredAtBoot": true, "generatedForDevelopment": true}
+  ]
+}
